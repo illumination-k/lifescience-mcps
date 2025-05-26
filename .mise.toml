@@ -1,0 +1,24 @@
+[tools]
+dprint = "0.47"
+actionlint = "1.7"
+pre-commit = "4"
+
+uv = "0.7"
+
+[tasks.fmt]
+run = [
+  "dprint fmt",
+  "uv run ruff format .",
+  "uv run ruff check . --fix",
+]
+
+[tasks.lint]
+run = [
+  "dprint check",
+  "actionlint",
+  "uv run ruff check .",
+  "uv run mypy .",
+]
+
+[tasks.test]
+run = "uv run pytest"
