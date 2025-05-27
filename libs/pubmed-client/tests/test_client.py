@@ -1,10 +1,9 @@
 import pytest
-
 from pubmed_client.client import PubMedClient
 
 
 @pytest.mark.asyncio
-async def test_asearch_with_real_api():
+async def test_asearch_with_real_api() -> None:
     """
     Test the asearch method with a real API call.
     This test ensures that the client can successfully connect to PubMed

@@ -1,11 +1,12 @@
-import httpx
 import logging
-
 from typing import Final
+
+import httpx
 
 logger = logging.getLogger(__name__)
 
 SEARCH_URL: Final[str] = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
+FETCH_ERROR_MSG: Final[str] = "Failed to fetch results after multiple attempts."
 
 
 class PubMedClient:
@@ -42,9 +43,9 @@ class PubMedClient:
                     response.raise_for_status()
                     data = response.json()
                     return data["esearchresult"].get("idlist", [])
-                except httpx.HTTPStatusError as e:
-                    logger.error(f"HTTP error on attempt {attempt + 1}: {e}")
-                except httpx.RequestError as e:
-                    logger.error(f"Request error on attempt {attempt + 1}: {e}")
+                except httpx.HTTPStatusError:
+                    logger.exception("HTTP error on attempt %d", attempt + 1)
+                except httpx.RequestError:
+                    logger.exception("Request error on attempt %d", attempt + 1)
 
-            raise RuntimeError("Failed to fetch results after multiple attempts.")
+            raise RuntimeError(FETCH_ERROR_MSG)
