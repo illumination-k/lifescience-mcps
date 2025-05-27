@@ -16,9 +16,13 @@ run = [
 run = [
   "dprint check",
   "actionlint",
+  "uvx zizmor .",
   "uv run --all-packages ruff check .",
   "uv run --all-packages mypy .",
 ]
 
 [tasks.test]
-run = "uv run pytest"
+run = "uv run --all-packages pytest"
+
+[tasks.ci]
+depends = ["lint", "test"]
