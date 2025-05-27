@@ -8,16 +8,16 @@ uv = "0.7"
 [tasks.fmt]
 run = [
   "dprint fmt",
-  "uv run ruff format .",
-  "uv run ruff check . --fix",
+  "uv run --all-packages ruff format .",
+  "uv run --all-packages ruff check . --fix",
 ]
 
 [tasks.lint]
 run = [
   "dprint check",
   "actionlint",
-  "uv run ruff check .",
-  "uv run mypy .",
+  "uv run --all-packages ruff check .",
+  "uv run --all-packages mypy .",
 ]
 
 [tasks.test]
