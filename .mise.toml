@@ -31,12 +31,12 @@ run = "uv run --all-packages pytest"
 dir = "{{ config_root }}/servers/pubtator3_mcp"
 run = "uv run --all-packages pytest"
 
-[tasks.test_cellosaurus_mcp]
-dir = "{{ config_root }}/servers/cellosaurus_mcp"
+[tasks.test_pubchem_mcp]
+dir = "{{ config_root }}/servers/pubchem_mcp"
 run = "uv run --all-packages pytest"
 
 [tasks.test]
-depends = ["test_pubmed", "test_pubtator3_mcp", "test_cellosaurus_mcp"]
+depends = ["test_pubmed", "test_pubtator3_mcp", "test_pubchem_mcp"]
 
 [tasks.ci]
 depends = ["lint", "test"]

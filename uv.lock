@@ -4,8 +4,8 @@ requires-python = ">=3.12"
 
 [manifest]
 members = [
-    "cellosaurus-mcp",
     "lifescience-mcps",
+    "pubchem-mcp",
     "pubmed-mcp",
     "pubtator3-mcp",
 ]
@@ -40,42 +40,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/5a/b0/1367933a8532ee6ff8d63537de4f1177af4bff9f3e829baf7331f595bb24/attrs-25.3.0.tar.gz", hash = "sha256:75d7cefc7fb576747b2c81b4442d4d4a1ce0900973527c011d1030fd3bf4af1b", size = 812032, upload-time = "2025-03-13T11:10:22.779Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/77/06/bb80f5f86020c4551da315d78b3ab75e8228f89f0162f2c3a819e407941a/attrs-25.3.0-py3-none-any.whl", hash = "sha256:427318ce031701fea540783410126f03899a97ffc6f61596ad581ac2e40e3bc3", size = 63815, upload-time = "2025-03-13T11:10:21.14Z" },
-]
-
-[[package]]
-name = "cellosaurus-api-methods-client"
-version = "1.0.4"
-source = { directory = "openapi_clients/cellosaurus" }
-dependencies = [
-    { name = "attrs" },
-    { name = "httpx" },
-    { name = "python-dateutil" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "attrs", specifier = ">=22.2.0" },
-    { name = "httpx", specifier = ">=0.20.0,<0.29.0" },
-    { name = "python-dateutil", specifier = ">=2.8.0,<3.0.0" },
-]
-
-[[package]]
-name = "cellosaurus-mcp"
-version = "0.1.0"
-source = { editable = "servers/cellosaurus_mcp" }
-dependencies = [
-    { name = "cellosaurus-api-methods-client" },
-    { name = "httpx" },
-    { name = "mcp" },
-    { name = "pydantic" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "cellosaurus-api-methods-client", directory = "openapi_clients/cellosaurus" },
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "mcp", specifier = ">=1.9.1" },
-    { name = "pydantic", specifier = ">=2.11.5" },
 ]
 
 [[package]]
@@ -369,6 +333,23 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f9/e2/3e91f31a7d2b083fe6ef3fa267035b518369d9511ffab804f839851d2779/pluggy-1.6.0.tar.gz", hash = "sha256:7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3", size = 69412, upload-time = "2025-05-15T12:30:07.975Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/54/20/4d324d65cc6d9205fabedc306948156824eb9f0ee1633355a8f7ec5c66bf/pluggy-1.6.0-py3-none-any.whl", hash = "sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746", size = 20538, upload-time = "2025-05-15T12:30:06.134Z" },
+]
+
+[[package]]
+name = "pubchem-mcp"
+version = "0.1.0"
+source = { editable = "servers/pubchem_mcp" }
+dependencies = [
+    { name = "httpx" },
+    { name = "mcp" },
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "mcp", specifier = ">=1.9.1" },
+    { name = "pydantic", specifier = ">=2.11.5" },
 ]
 
 [[package]]
