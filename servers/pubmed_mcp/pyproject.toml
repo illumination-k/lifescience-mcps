@@ -17,7 +17,6 @@ dependencies = [
 [project.scripts]
 pubmed-mcp = "pubmed_mcp.server:serve"
 
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

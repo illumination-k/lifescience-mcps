@@ -56,20 +56,38 @@ class PubMedClient:
 
             raise RuntimeError(ErrorMessage.FETCH_ERROR.value)
 
-    async def asearch_pmids(self, keyword: str, retmax: int = 30) -> PubMedSearchResult:
+    async def asearch_pmids(
+        self,
+        keyword: str,
+        retmax: int = 30,
+        date_start: str | None = None,
+        date_end: str | None = None,
+    ) -> PubMedSearchResult:
         """
         Asynchronous search for PubMed articles by keyword.
 
         Args:
             keyword (str): The search term to query PubMed.
             retmax (int): Maximum number of results to return.
+            date_start (str, optional): Start date in format YYYY/MM/DD. Used for date range filter.
+            date_end (str, optional): End date in format YYYY/MM/DD. Used for date range filter.
 
         Returns:
             PubMedSearchResult: Object containing PMIDs and search metadata.
         """
+        term = keyword
+
+        # Add date filter using [dp] date of publication field if provided
+        if date_start and date_end:
+            term = f"{term} AND {date_start}:{date_end}[dp]"
+        elif date_start:
+            term = f"{term} AND {date_start}[dp]"
+        elif date_end:
+            term = f"{term} AND {date_end}[dp]"
+
         params = {
             "db": "pubmed",
-            "term": keyword,
+            "term": term,
             "retmode": "json",
             "retmax": str(retmax),
         }
@@ -141,7 +159,11 @@ class PubMedClient:
         return parse_pubmed_xml(await self._afetch_articles_xml(pmids))
 
     async def asearch_articles(
-        self, keyword: str, retmax: int = 30
+        self,
+        keyword: str,
+        retmax: int = 30,
+        date_start: str | None = None,
+        date_end: str | None = None,
     ) -> PubMedArticleResult:
         """
         Asynchronously search for PubMed articles by keyword.
@@ -149,9 +171,11 @@ class PubMedClient:
         Args:
             keyword (str): The search term to query PubMed.
             retmax (int): Maximum number of results to return.
+            date_start (str, optional): Start date in format YYYY/MM/DD. Used for date range filter.
+            date_end (str, optional): End date in format YYYY/MM/DD. Used for date range filter.
 
         Returns:
-            PubMedSearchResult: Object containing PMIDs and search metadata.
+            PubMedArticleResult: Object containing PMIDs and search metadata.
         """
-        search_result = await self.asearch_pmids(keyword, retmax)
+        search_result = await self.asearch_pmids(keyword, retmax, date_start, date_end)
         return await self.afetch_articles(search_result.pmids)
