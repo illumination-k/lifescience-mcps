@@ -39,6 +39,28 @@ async def search(
     return result
 
 
+@mcp.tool("get_fulltext")
+async def get_fulltext(
+    pmid: str,
+) -> str:
+    """
+    Retrieve the full text of a PubMed article as plain text.
+
+    This function downloads the PDF version of an article from PubMed Central
+    and extracts the text content.
+
+    Args:
+        pmid (str): The PubMed ID of the article.
+
+    Returns:
+        str: The full text content of the article.
+
+    Raises:
+        RuntimeError: If the article is not available as open access or if there's an error accessing the PDF.
+    """
+    return await PubMedClient().afetch_fulltext(pmid)
+
+
 def serve() -> None:
     """
     Start the FastMCP server for PubMed.

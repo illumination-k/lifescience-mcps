@@ -30,6 +30,17 @@ def parse_pubmed_xml(xml_data: str) -> PubMedArticleResult:  # noqa: C901,PLR091
 
             pmid = pmid_element.text
 
+            # Extract PMC ID if available
+            pmc_id = None
+            article_id_elements = article_element.findall(".//ArticleId")
+            for article_id_element in article_id_elements:
+                if (
+                    article_id_element.attrib.get("IdType") == "pmc"
+                    and article_id_element.text
+                ):
+                    pmc_id = article_id_element.text
+                    break
+
             # Extract article title
             title = None
             title_element = article_element.find(".//ArticleTitle")
@@ -120,6 +131,7 @@ def parse_pubmed_xml(xml_data: str) -> PubMedArticleResult:  # noqa: C901,PLR091
             # Create PubMedArticle object
             article = PubMedArticle(
                 pmid=pmid,
+                pmc_id=pmc_id,
                 title=title,
                 abstract=abstract,
                 journal=journal,

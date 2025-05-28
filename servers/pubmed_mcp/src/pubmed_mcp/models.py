@@ -30,6 +30,7 @@ class PubMedArticle(BaseModel):
     """Representation of a PubMed article."""
 
     pmid: str
+    pmc_id: str | None = None
     title: str | None = None
     abstract: str | None = None
     journal: Journal | None = None
