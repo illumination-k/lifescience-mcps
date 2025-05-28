@@ -1,0 +1,20 @@
+[project]
+name = "pubmed-mcp"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+  { name = "illumination-k", email = "skawamura27@preferred.jp" },
+]
+requires-python = ">=3.12"
+dependencies = [
+  "mcp>=1.9.1",
+  "pubmed_client",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv.sources]
+pubmed_client = { workspace = true }

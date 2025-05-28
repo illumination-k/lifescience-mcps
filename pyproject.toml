@@ -6,7 +6,8 @@ dependencies = []
 
 [tool.uv.workspace]
 members = [
-  "libs/pubmed-client",
+  "libs/*",
+  "servers/*",
 ]
 
 [dependency-groups]
