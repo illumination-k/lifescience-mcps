@@ -51,7 +51,7 @@ async def test_asearch_articles_open_access_pmc_id() -> None:
         "Should return at least one article for open access search"
     )
     for article in result.articles:
-        assert article.pmc_id is not None and article.pmc_id is not None, (
+        assert article.pmc_id is not None, (
             f"Article {article.pmid} should have a pmc_id when open_access=True"
         )
 

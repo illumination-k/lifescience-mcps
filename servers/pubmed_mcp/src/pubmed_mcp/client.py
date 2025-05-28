@@ -9,8 +9,7 @@ from .models import (
     PubMedArticleResult,
     PubMedSearchResult,
 )
-from .parser import parse_pubmed_xml
-from .pdf_parser import extract_text_from_pdf
+from .parser import parse_pmc_fulltext_xml, parse_pubmed_xml
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +35,12 @@ class PubMedClient:
         self.n_retries = n_retries
 
     async def _get(
-        self, url: str, params: dict, *, follow_redirects: bool = False
+        self,
+        url: str,
+        params: dict | None = None,
+        headers: dict | None = None,
+        *,
+        follow_redirects: bool = False,
     ) -> httpx.Response:
         """
         Helper method to perform GET requests with retries.
@@ -48,12 +52,13 @@ class PubMedClient:
         Returns:
             httpx.Response: The response object from the GET request.
         """
+
         async with httpx.AsyncClient(
             timeout=self.timeout, follow_redirects=follow_redirects
         ) as client:
             for attempt in range(self.n_retries):
                 try:
-                    response = await client.get(url, params=params)
+                    response = await client.get(url, params=params, headers=headers)
                     response.raise_for_status()
                 except httpx.HTTPStatusError:
                     logger.exception("HTTP error on attempt %d", attempt + 1)
@@ -71,6 +76,7 @@ class PubMedClient:
         date_start: str | None = None,
         date_end: str | None = None,
         mesh_terms: list[str] | None = None,
+        *,
         open_access: bool = False,
     ) -> PubMedSearchResult:
         """
@@ -186,6 +192,7 @@ class PubMedClient:
         date_start: str | None = None,
         date_end: str | None = None,
         mesh_terms: list[str] | None = None,
+        *,
         open_access: bool = False,
     ) -> PubMedArticleResult:
         """
@@ -235,37 +242,12 @@ class PubMedClient:
         if not pmc_id:
             raise RuntimeError(ErrorMessage.NO_PMC_ID.value)
 
-        # Use PMC's efetch API to get the full text XML
-        params = {
-            "db": "pmc",
-            "id": pmc_id.replace("PMC", ""),  # Remove "PMC" prefix
-            "retmode": "xml",
-            "rettype": "full",
-        }
+        # Fetch the full text XML from PMC
+        pmc_url = f"{FETCH_URL}?db=pmc&id={pmc_id}&retmode=xml&rettype=full"
+        response = await self._get(pmc_url)
 
-        response = await self._get(FETCH_URL, params=params)
-
-        # For simplicity, we'll extract text from XML
-        # This is a basic implementation - could be enhanced with better XML parsing
-        xml_content = response.text
-
-        # Extract text content from XML
-        # We could implement a more sophisticated XML parser here
-        # For now, removing tags with a simple approach
-        import re
-
-        text = re.sub(r"<[^>]+>", " ", xml_content)
-        text = re.sub(r"\s+", " ", text).strip()
-
+        text = parse_pmc_fulltext_xml(response.text)
         if not text:
-            # If XML parsing didn't work well, try to get PDF as fallback
-            try:
-                pdf_url = f"https://pmc.ncbi.nlm.nih.gov/articles/{pmc_id}/pdf/"
-                response = await self._get(pdf_url, params={}, follow_redirects=True)
-                text = extract_text_from_pdf(response.content)
-            except Exception as e:
-                logger.warning(f"PDF fallback failed: {e!s}")
-                if not text:
-                    raise RuntimeError(ErrorMessage.NOT_OPEN_ACCESS.value)
+            raise RuntimeError(ErrorMessage.PDF_ACCESS_ERROR.value)
 
         return text

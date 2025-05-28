@@ -15,6 +15,7 @@ async def search(
     date_start: str | None = None,
     date_end: str | None = None,
     mesh_terms: list[str] | None = None,
+    *,
     open_access: bool = False,
 ) -> PubMedArticleResult:
     """

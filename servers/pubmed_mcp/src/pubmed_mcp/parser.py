@@ -146,3 +146,56 @@ def parse_pubmed_xml(xml_data: str) -> PubMedArticleResult:  # noqa: C901,PLR091
         logger.exception("Failed to parse PubMed XML data")
         msg = "Failed to parse PubMed XML data."
         raise RuntimeError(msg) from e
+
+
+def parse_pmc_fulltext_xml(xml_data: str) -> str:
+    """
+    Extract full text content from PMC XML data.
+
+    Args:
+        xml_data (str): XML data from the PMC API.
+
+    Returns:
+        str: The full text content of the article.
+
+    Raises:
+        RuntimeError: If parsing fails or no text content is found.
+    """
+    try:
+        root = ET.fromstring(xml_data)
+
+        # Extract all text from the article body
+        text_sections = []
+
+        # Get the title
+        title_elements = root.findall(".//article-title")
+        if title_elements:
+            for title_elem in title_elements:
+                if title_elem.text:
+                    text_sections.append(title_elem.text)
+
+        # Get the abstract
+        abstract_elements = root.findall(".//abstract//p")
+        for abstract_elem in abstract_elements:
+            if abstract_elem.text:
+                text_sections.append(abstract_elem.text)
+
+        # Get all paragraphs from the main text
+        body_paragraphs = root.findall(".//body//p")
+        for para in body_paragraphs:
+            # Recursively extract text from this paragraph and its children
+            para_text = "".join(para.itertext()).strip()
+            if para_text:
+                text_sections.append(para_text)
+
+        # If we found any content, return it
+        if text_sections:
+            return "\n\n".join(text_sections)
+
+        # If we get here, we didn't find any content
+        raise RuntimeError("No text content found in PMC XML")
+
+    except ET.ParseError as e:
+        logger.exception("Failed to parse PMC XML data")
+        msg = "Failed to parse PMC XML data."
+        raise RuntimeError(msg) from e
