@@ -23,9 +23,20 @@ run = [
   "uv run --all-packages mypy .",
 ]
 
-[tasks.test]
-dir = "{{ config_root }}"
+[tasks.test_pubmed]
+dir = "{{ config_root }}/servers/pubmed_mcp"
 run = "uv run --all-packages pytest"
+
+[tasks.test_pubtator3_mcp]
+dir = "{{ config_root }}/servers/pubtator3_mcp"
+run = "uv run --all-packages pytest"
+
+[tasks.test_cellosaurus_mcp]
+dir = "{{ config_root }}/servers/cellosaurus_mcp"
+run = "uv run --all-packages pytest"
+
+[tasks.test]
+depends = ["test_pubmed", "test_pubtator3_mcp", "test_cellosaurus_mcp"]
 
 [tasks.ci]
 depends = ["lint", "test"]

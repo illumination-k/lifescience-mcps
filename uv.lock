@@ -4,6 +4,7 @@ requires-python = ">=3.12"
 
 [manifest]
 members = [
+    "cellosaurus-mcp",
     "lifescience-mcps",
     "pubmed-mcp",
     "pubtator3-mcp",
@@ -31,6 +32,32 @@ sdist = { url = "https://files.pythonhosted.org/packages/95/7d/4c1bd541d4dffa1b5
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a1/ee/48ca1a7c89ffec8b6a0c5d02b89c305671d5ffd8d3c94acf8b8c408575bb/anyio-4.9.0-py3-none-any.whl", hash = "sha256:9f76d541cad6e36af7beb62e978876f3b41e3e04f2c1fbf0884604c0a9c4d93c", size = 100916, upload-time = "2025-03-17T00:02:52.713Z" },
 ]
+
+[[package]]
+name = "cellosaurus-mcp"
+version = "0.1.0"
+source = { editable = "servers/cellosaurus_mcp" }
+dependencies = [
+    { name = "httpx" },
+    { name = "mcp" },
+    { name = "pydantic" },
+]
+
+[package.optional-dependencies]
+test = [
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "mcp", specifier = ">=1.9.1" },
+    { name = "pydantic", specifier = ">=2.11.5" },
+    { name = "pytest", marker = "extra == 'test'", specifier = ">=8.3.0" },
+    { name = "pytest-asyncio", marker = "extra == 'test'", specifier = ">=0.23.5" },
+]
+provides-extras = ["test"]
 
 [[package]]
 name = "certifi"
@@ -260,7 +287,7 @@ dev = [{ name = "types-defusedxml", specifier = ">=0.7.0.20250516" }]
 [[package]]
 name = "pubtator3-mcp"
 version = "0.1.0"
-source = { editable = "servers/pubtator3-mcp" }
+source = { editable = "servers/pubtator3_mcp" }
 dependencies = [
     { name = "httpx" },
     { name = "mcp" },
