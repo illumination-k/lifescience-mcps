@@ -35,7 +35,9 @@ class PubMedClient:
         self.timeout = timeout
         self.n_retries = n_retries
 
-    async def _get(self, url: str, params: dict) -> httpx.Response:
+    async def _get(
+        self, url: str, params: dict, *, follow_redirects: bool = False
+    ) -> httpx.Response:
         """
         Helper method to perform GET requests with retries.
 
@@ -46,7 +48,9 @@ class PubMedClient:
         Returns:
             httpx.Response: The response object from the GET request.
         """
-        async with httpx.AsyncClient(timeout=self.timeout) as client:
+        async with httpx.AsyncClient(
+            timeout=self.timeout, follow_redirects=follow_redirects
+        ) as client:
             for attempt in range(self.n_retries):
                 try:
                     response = await client.get(url, params=params)
@@ -209,17 +213,16 @@ class PubMedClient:
 
     async def afetch_fulltext(self, pmid: str) -> str:
         """
-        Download the full text PDF of a PubMed article.
+        Fetch the full text of a PubMed article using PMC API.
 
         Args:
             pmid (str): The PubMed ID of the article.
-            save_dir (str): The directory where the PDF will be saved.
 
         Returns:
-            str: The file path of the saved PDF.
+            str: The full text content of the article.
 
         Raises:
-            RuntimeError: If there is an error accessing the PDF or if the article is not open access.
+            RuntimeError: If there is an error accessing the article or if the article is not open access.
         """
         # Fetch the article details to get the PMC ID
         result = await self.afetch_articles(pmid)
@@ -232,19 +235,37 @@ class PubMedClient:
         if not pmc_id:
             raise RuntimeError(ErrorMessage.NO_PMC_ID.value)
 
-        # Construct the URL for the PDF download
-        pdf_url = f"https://www.ncbi.nlm.nih.gov/pmc/articles/{pmc_id}/pdf/"
+        # Use PMC's efetch API to get the full text XML
+        params = {
+            "db": "pmc",
+            "id": pmc_id.replace("PMC", ""),  # Remove "PMC" prefix
+            "retmode": "xml",
+            "rettype": "full",
+        }
 
-        # Download the PDF
-        async with httpx.AsyncClient(timeout=self.timeout) as client:
-            response = await client.get(pdf_url)
+        response = await self._get(FETCH_URL, params=params)
 
-            if response.status_code == 200:
-                # Return structured data from the pdf
+        # For simplicity, we'll extract text from XML
+        # This is a basic implementation - could be enhanced with better XML parsing
+        xml_content = response.text
+
+        # Extract text content from XML
+        # We could implement a more sophisticated XML parser here
+        # For now, removing tags with a simple approach
+        import re
+
+        text = re.sub(r"<[^>]+>", " ", xml_content)
+        text = re.sub(r"\s+", " ", text).strip()
+
+        if not text:
+            # If XML parsing didn't work well, try to get PDF as fallback
+            try:
+                pdf_url = f"https://pmc.ncbi.nlm.nih.gov/articles/{pmc_id}/pdf/"
+                response = await self._get(pdf_url, params={}, follow_redirects=True)
                 text = extract_text_from_pdf(response.content)
+            except Exception as e:
+                logger.warning(f"PDF fallback failed: {e!s}")
+                if not text:
+                    raise RuntimeError(ErrorMessage.NOT_OPEN_ACCESS.value)
 
-                return text
-            logger.error(
-                "Failed to download PDF, status code: %d", response.status_code
-            )
-            raise RuntimeError(ErrorMessage.PDF_ACCESS_ERROR.value)
+        return text
