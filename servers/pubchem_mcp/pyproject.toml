@@ -1,0 +1,18 @@
+[project]
+name = "pubchem-mcp"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "illumination-k", email = "skawamura27@preferred.jp" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "httpx>=0.28.1",
+    "mcp>=1.9.1",
+    "pydantic>=2.11.5",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
