@@ -39,6 +39,24 @@ async def test_asearch_pmids_with_real_api() -> None:
 
 
 @pytest.mark.asyncio
+async def test_asearch_articles_open_access_pmc_id() -> None:
+    """
+    Test that all articles returned with open_access=True have a pmc_id.
+    """
+    client = PubMedClient()
+    keyword = "cancer"  # Should yield open access articles
+    retmax = 5
+    result = await client.asearch_articles(keyword, retmax=retmax, open_access=True)
+    assert len(result.articles) > 0, (
+        "Should return at least one article for open access search"
+    )
+    for article in result.articles:
+        assert article.pmc_id is not None and article.pmc_id is not None, (
+            f"Article {article.pmid} should have a pmc_id when open_access=True"
+        )
+
+
+@pytest.mark.asyncio
 async def test_afetch_articles_with_real_api() -> None:
     """
     Test the afetch_articles method with a real API call.

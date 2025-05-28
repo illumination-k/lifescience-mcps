@@ -8,13 +8,14 @@ logger = logging.getLogger(__name__)
 mcp = FastMCP("PubMed")
 
 
-@mcp.tool("search")
+@mcp.tool("pubmed_search")
 async def search(
     keyword: str,
     retmax: int = 30,
     date_start: str | None = None,
     date_end: str | None = None,
     mesh_terms: list[str] | None = None,
+    open_access: bool = False,
 ) -> PubMedArticleResult:
     """
     Search PubMed for articles matching the given keyword.
@@ -35,11 +36,12 @@ async def search(
         date_start=date_start,
         date_end=date_end,
         mesh_terms=mesh_terms,
+        open_access=open_access,
     )
     return result
 
 
-@mcp.tool("get_fulltext")
+@mcp.tool("get_pmc_fulltext")
 async def get_fulltext(
     pmid: str,
 ) -> str:

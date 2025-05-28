@@ -67,6 +67,7 @@ class PubMedClient:
         date_start: str | None = None,
         date_end: str | None = None,
         mesh_terms: list[str] | None = None,
+        open_access: bool = False,
     ) -> PubMedSearchResult:
         """
         Asynchronous search for PubMed articles by keyword.
@@ -77,6 +78,7 @@ class PubMedClient:
             date_start (str, optional): Start date in format YYYY/MM/DD. Used for date range filter.
             date_end (str, optional): End date in format YYYY/MM/DD. Used for date range filter.
             mesh_terms (list[str], optional): List of MeSH terms for filtering. Used mainly for specifying organisms.
+            open_access (bool, optional): If True, filter results to only include open access articles. Default is False.
 
         Returns:
             PubMedSearchResult: Object containing PMIDs and search metadata.
@@ -95,6 +97,10 @@ class PubMedClient:
         if mesh_terms and len(mesh_terms) > 0:
             mesh_query = " AND ".join([f'"{term}"[mesh]' for term in mesh_terms])
             term = f"{term} AND ({mesh_query})"
+
+        # Add open access filter if requested
+        if open_access:
+            term = f'{term} AND "pubmed pmc"[sb]'
 
         params = {
             "db": "pubmed",
@@ -176,6 +182,7 @@ class PubMedClient:
         date_start: str | None = None,
         date_end: str | None = None,
         mesh_terms: list[str] | None = None,
+        open_access: bool = False,
     ) -> PubMedArticleResult:
         """
         Asynchronously search for PubMed articles by keyword.
@@ -196,6 +203,7 @@ class PubMedClient:
             date_start=date_start,
             date_end=date_end,
             mesh_terms=mesh_terms,
+            open_access=open_access,
         )
         return await self.afetch_articles(search_result.pmids)
 
