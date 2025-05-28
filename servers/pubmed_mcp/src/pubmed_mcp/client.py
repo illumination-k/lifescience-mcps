@@ -62,6 +62,7 @@ class PubMedClient:
         retmax: int = 30,
         date_start: str | None = None,
         date_end: str | None = None,
+        mesh_terms: list[str] | None = None,
     ) -> PubMedSearchResult:
         """
         Asynchronous search for PubMed articles by keyword.
@@ -71,6 +72,7 @@ class PubMedClient:
             retmax (int): Maximum number of results to return.
             date_start (str, optional): Start date in format YYYY/MM/DD. Used for date range filter.
             date_end (str, optional): End date in format YYYY/MM/DD. Used for date range filter.
+            mesh_terms (list[str], optional): List of MeSH terms for filtering. Used mainly for specifying organisms.
 
         Returns:
             PubMedSearchResult: Object containing PMIDs and search metadata.
@@ -84,6 +86,11 @@ class PubMedClient:
             term = f"{term} AND {date_start}[dp]"
         elif date_end:
             term = f"{term} AND {date_end}[dp]"
+
+        # Add MeSH term filters if provided
+        if mesh_terms and len(mesh_terms) > 0:
+            mesh_query = " AND ".join([f'"{term}"[mesh]' for term in mesh_terms])
+            term = f"{term} AND ({mesh_query})"
 
         params = {
             "db": "pubmed",
@@ -164,6 +171,7 @@ class PubMedClient:
         retmax: int = 30,
         date_start: str | None = None,
         date_end: str | None = None,
+        mesh_terms: list[str] | None = None,
     ) -> PubMedArticleResult:
         """
         Asynchronously search for PubMed articles by keyword.
@@ -173,9 +181,16 @@ class PubMedClient:
             retmax (int): Maximum number of results to return.
             date_start (str, optional): Start date in format YYYY/MM/DD. Used for date range filter.
             date_end (str, optional): End date in format YYYY/MM/DD. Used for date range filter.
+            mesh_terms (list[str], optional): List of MeSH terms for filtering. Used mainly for specifying organisms.
 
         Returns:
             PubMedArticleResult: Object containing PMIDs and search metadata.
         """
-        search_result = await self.asearch_pmids(keyword, retmax, date_start, date_end)
+        search_result = await self.asearch_pmids(
+            keyword,
+            retmax=retmax,
+            date_start=date_start,
+            date_end=date_end,
+            mesh_terms=mesh_terms,
+        )
         return await self.afetch_articles(search_result.pmids)
