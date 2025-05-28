@@ -1,6 +1,9 @@
 import httpx
 import pytest
-from pubtator3_mcp.server import PubTator3Client, PubTator3Concept
+from pubtator3_mcp.client import PubTator3Client, PubTator3Concept
+from pubtator3_mcp.models import (
+    PubTator3AnnotationResult,
+)
 
 
 @pytest.mark.asyncio
@@ -102,6 +105,56 @@ async def test_autocomplete_with_empty_keyword() -> None:
     keyword = ""  # Empty keyword
 
     # Act & Assert
-    with pytest.raises(httpx.HTTPStatusError):
+    with pytest.raises(httpx.HTTPError):
         # Expecting an error due to empty keyword
         await client.autocomplete(keyword)
+
+
+@pytest.mark.asyncio
+async def test_annotate_with_real_api() -> None:
+    """
+    Test the annotate method with a real API call.
+    This test verifies that the client can successfully connect to PubTator3
+    and retrieve annotations for a given PMID.
+    """
+    # Arrange
+    client = PubTator3Client()
+    pmids = ["34613458"]  # Use a specific PMID that's likely to have annotations
+
+    # Act
+    results = await client.annotate(pmids)
+
+    # Assert
+    assert isinstance(results, list), "Return value should be a list"
+    assert len(results) > 0, "Should return at least one annotation result"
+
+    for result in results:
+        assert isinstance(result, PubTator3AnnotationResult), (
+            "Each result should be a PubTator3AnnotationResult"
+        )
+        assert result.pmid == pmids[0], "PMID in result should match the requested PMID"
+        assert hasattr(result, "sections"), "Result should have sections attribute"
+
+
+@pytest.mark.asyncio
+async def test_annotate_with_multiple_pmids() -> None:
+    """
+    Test the annotate method with multiple PMIDs.
+    This test ensures that the client can handle multiple PMIDs in a single request.
+    """
+    # Arrange
+    client = PubTator3Client(n_retries=1)
+    pmids = ["34613458", "33930893"]  # Use PMIDs that are likely to have annotations
+
+    # Act
+    results = await client.annotate(pmids)
+
+    # Assert
+    assert isinstance(results, list), "Return value should be a list"
+    assert len(results) > 0, "Should return at least one annotation result"
+
+    # Check that we have results for both PMIDs
+    result_pmids = {result.pmid for result in results}
+    assert result_pmids.issubset(set(pmids)), (
+        "Results should contain annotations for requested PMIDs"
+    )

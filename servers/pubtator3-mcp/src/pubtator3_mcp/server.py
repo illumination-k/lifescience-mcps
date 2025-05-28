@@ -1,8 +1,10 @@
 import logging
 from typing import Final, Literal
 
-import httpx
 from mcp.server.fastmcp import FastMCP
+
+from .client import PubTator3Client
+from .models import PubTator3AnnotationResult
 
 logger = logging.getLogger(__name__)
 
@@ -19,41 +21,19 @@ PubTator3Concept = Literal[
 mcp = FastMCP("PubTator3-MCP")
 
 
-class PubTator3Client:
+@mcp.tool("pubtator3_annotate")
+async def annotate(
+    pmids: list[str],
+) -> list[PubTator3AnnotationResult]:
     """
-    Client for interacting with the PubTator3 API.
-    This client provides methods to autocomplete keywords and retrieve normalized terms.
+    Annotate paper in pubmed using the PubTator3 API.
+    This function can extract terms related to genes, diseases, chemicals, or species from text and return the normalized terms.
+
+    Args:
+        pmids (list[str]): List of PubMed IDs to annotate.
     """
-
-    def __init__(self, timeout: float = 30.0) -> None:
-        self.timeout = timeout
-
-    async def autocomplete(
-        self, keyword: str, concept: PubTator3Concept | None = None
-    ) -> dict:
-        """
-        Autocomplete keywords using the PubTator3 API.
-
-        Args:
-            keyword (str): The keyword to autocomplete.
-            concept (PubTator3Concept, optional): The concept type to filter results by.
-                Can be one of "gene", "disease", "chemical", or "species".
-
-        Returns:
-            dict: The response from the PubTator3 API containing normalized terms.
-        """
-        params = {"query": keyword, "limit": 1}
-
-        if concept:
-            params["concept"] = concept
-
-        async with httpx.AsyncClient(timeout=self.timeout) as client:
-            response = await client.get(PUBTATOR3_API_ENDPOINT, params=params)
-            response.raise_for_status()
-            results = response.json()
-            if len(results) == 0:
-                return {}
-            return results[0]  # Return the first result as a dictionary
+    client = PubTator3Client()
+    return await client.annotate(pmids=pmids)
 
 
 @mcp.tool("pubtator3_autocomplete")
