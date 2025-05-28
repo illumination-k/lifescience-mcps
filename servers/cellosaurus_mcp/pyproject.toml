@@ -11,32 +11,15 @@ dependencies = [
   "httpx>=0.28.1",
   "mcp>=1.9.1",
   "pydantic>=2.11.5",
-]
-
-[project.optional-dependencies]
-test = [
-  "pytest>=8.3.0",
-  "pytest-asyncio>=0.23.5",
+  "cellosaurus-api-methods-client"
 ]
 
 [project.scripts]
 cellosaurus-mcp = "cellosaurus_mcp.server:serve"
 
+[tool.uv.sources]
+cellosaurus-api-methods-client = { path = "../../openapi_clients/cellosaurus" }
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-asyncio_mode = "auto"
-
-[tool.mypy]
-python_version = "3.12"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-
-[tool.black]
-line-length = 88
-target-version = ["py312"]
