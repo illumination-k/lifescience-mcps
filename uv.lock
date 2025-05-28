@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 members = [
     "lifescience-mcps",
     "pubmed-mcp",
+    "pubtator3-mcp",
 ]
 
 [[package]]
@@ -255,6 +256,23 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [{ name = "types-defusedxml", specifier = ">=0.7.0.20250516" }]
+
+[[package]]
+name = "pubtator3-mcp"
+version = "0.1.0"
+source = { editable = "servers/pubtator3-mcp" }
+dependencies = [
+    { name = "httpx" },
+    { name = "mcp" },
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "mcp", specifier = ">=1.9.1" },
+    { name = "pydantic", specifier = ">=2.11.5" },
+]
 
 [[package]]
 name = "pydantic"

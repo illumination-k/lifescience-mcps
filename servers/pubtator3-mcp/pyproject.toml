@@ -1,0 +1,21 @@
+[project]
+name = "pubtator3-mcp"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+  { name = "illumination-k", email = "skawamura27@preferred.jp" },
+]
+requires-python = ">=3.12"
+dependencies = [
+  "httpx>=0.28.1",
+  "mcp>=1.9.1",
+  "pydantic>=2.11.5",
+]
+
+[project.scripts]
+pubtator3-mcp = "pubtator3_mcp.server:serve"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
