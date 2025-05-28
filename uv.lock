@@ -5,7 +5,6 @@ requires-python = ">=3.12"
 [manifest]
 members = [
     "lifescience-mcps",
-    "pubmed-client",
     "pubmed-mcp",
 ]
 
@@ -231,12 +230,13 @@ wheels = [
 ]
 
 [[package]]
-name = "pubmed-client"
+name = "pubmed-mcp"
 version = "0.1.0"
-source = { editable = "libs/pubmed_client" }
+source = { editable = "servers/pubmed_mcp" }
 dependencies = [
     { name = "defusedxml" },
     { name = "httpx" },
+    { name = "mcp" },
     { name = "pydantic" },
 ]
 
@@ -249,26 +249,12 @@ dev = [
 requires-dist = [
     { name = "defusedxml", specifier = ">=0.7.1" },
     { name = "httpx", specifier = ">=0.28.1" },
+    { name = "mcp", specifier = ">=1.9.1" },
     { name = "pydantic", specifier = ">=2.11.5" },
 ]
 
 [package.metadata.requires-dev]
 dev = [{ name = "types-defusedxml", specifier = ">=0.7.0.20250516" }]
-
-[[package]]
-name = "pubmed-mcp"
-version = "0.1.0"
-source = { editable = "servers/pubmed_mcp" }
-dependencies = [
-    { name = "mcp" },
-    { name = "pubmed-client" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "mcp", specifier = ">=1.9.1" },
-    { name = "pubmed-client", editable = "libs/pubmed_client" },
-]
 
 [[package]]
 name = "pydantic"

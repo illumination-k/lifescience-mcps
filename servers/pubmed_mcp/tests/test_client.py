@@ -1,6 +1,6 @@
 import pytest
-from pubmed_client.client import PubMedClient
-from pubmed_client.models import (
+from pubmed_mcp.client import PubMedClient
+from pubmed_mcp.models import (
     PubMedArticle,
     PubMedArticleResult,
     PubMedSearchResult,
